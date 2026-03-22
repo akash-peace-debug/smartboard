@@ -19,7 +19,7 @@ export default function StaffUpload() {
     formData.append('unit', unit);
     formData.append('uploadedBy', localStorage.getItem('name') || 'Staff');
     setStatus('⏳ Uploading...');
-    await axios.post('http://localhost:5000/api/ppt/upload', formData);
+    await axios.post('https://smartboard-12j5.onrender.com', formData);
     setStatus('✅ Board-ல Live ஆச்சு!');
     setFile(null);
   };

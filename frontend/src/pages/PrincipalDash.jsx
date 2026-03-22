@@ -31,7 +31,7 @@ export default function PrincipalDash() {
 
   const analyse = async () => {
     setLoading(true); setResult(null);
-    const res = await axios.post('http://localhost:5000/api/analyse/unit',
+    const res = await axios.post('https://smartboard-12j5.onrender.com',
       { department: dept, year, subject: subj, unit });
     setResult(res.data);
     setLoading(false);
