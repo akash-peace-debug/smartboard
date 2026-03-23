@@ -9,7 +9,7 @@ app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
 // MongoDB Connect
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/smartboard';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/smartboardmongodb+srv://smartboard:smartboard123@smartboard.r4n8jgr.mongodb.net/?appName=smartboard';
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.log('❌ MongoDB Error:', err));
