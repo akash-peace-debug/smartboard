@@ -1,15 +1,19 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from './pages/Login';
-import StaffUpload from './pages/StaffUpload';
-import PrincipalDash from './pages/PrincipalDash';
+import Home from './pages/Home';
+import Years from './pages/Years';
+import Subjects from './pages/Subjects';
+import Units from './pages/Units';
+import Viewer from './pages/Viewer';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/"          element={<Login />} />
-        <Route path="/staff"     element={<StaffUpload />} />
-        <Route path="/principal" element={<PrincipalDash />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/years/:dept" element={<Years />} />
+        <Route path="/subjects/:dept/:year" element={<Subjects />} />
+        <Route path="/units/:dept/:year/:subject" element={<Units />} />
+        <Route path="/viewer/:dept/:year/:subject/:unit" element={<Viewer />} />
       </Routes>
     </BrowserRouter>
   );
