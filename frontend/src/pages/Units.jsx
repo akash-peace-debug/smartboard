@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
+const UPLOAD_PIN = 'upload@123';
+
 const unitNames = {
   'Data Structures':      ['Arrays & Linked List','Stacks & Queues','Trees','Graphs','Hashing'],
   'Operating Systems':    ['Process Management','CPU Scheduling','Memory Management','File Systems','Deadlocks'],
@@ -53,6 +55,14 @@ export default function Units() {
   const [uploadMsg, setUploadMsg] = useState('');
   const [analysing, setAnalysing] = useState(false);
   const [analysis, setAnalysis] = useState(null);
+
+  // PIN popup state
+  const [showPinPopup, setShowPinPopup] = useState(false);
+  const [pin, setPin] = useState('');
+  const [uploaderName, setUploaderName] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [pinVerified, setPinVerified] = useState(false);
+
   const fileRef = useRef();
   const longPressTimer = useRef();
 
@@ -66,6 +76,36 @@ export default function Units() {
     clearTimeout(longPressTimer.current);
   };
 
+  // Upload button click — show PIN popup
+  const handleUploadClick = () => {
+    if (!selectedUnit) {
+      alert('Long press a unit first!');
+      return;
+    }
+    setShowPinPopup(true);
+    setPin('');
+    setUploaderName('');
+    setPinError('');
+    setPinVerified(false);
+  };
+
+  // PIN verify
+  const handlePinVerify = () => {
+    if (pin !== UPLOAD_PIN) {
+      setPinError('❌ Wrong PIN! Try again.');
+      return;
+    }
+    if (!uploaderName.trim()) {
+      setPinError('❌ Please enter your name!');
+      return;
+    }
+    setPinVerified(true);
+    setPinError('');
+    setShowPinPopup(false);
+    fileRef.current.click();
+  };
+
+  // File upload
   const handleUpload = async (e) => {
     const file = e.target.files[0];
     if (!file || !selectedUnit) return;
@@ -77,6 +117,7 @@ export default function Units() {
     formData.append('year', year);
     formData.append('subject', decodedSubject);
     formData.append('unit', `Unit ${selectedUnit.idx + 1}`);
+    formData.append('uploadedBy', uploaderName);
     try {
       await axios.post('http://localhost:5000/api/ppt/upload', formData);
       setUploadMsg('✅ Upload success!');
@@ -84,10 +125,14 @@ export default function Units() {
       setUploadMsg('❌ Upload failed!');
     }
     setUploading(false);
+    setPinVerified(false);
+    setUploaderName('');
     setTimeout(() => setUploadMsg(''), 3000);
     setSelectedUnit(null);
+    fileRef.current.value = '';
   };
 
+  // Analyse
   const handleAnalyse = async () => {
     if (!selectedUnit) return;
     setAnalysing(true);
@@ -111,10 +156,86 @@ export default function Units() {
       background: '#0d0f1a', minHeight: '100vh',
       padding: '24px 16px', color: '#e2e8f0'
     }}>
+      {/* Hidden file input */}
       <input
         type="file" ref={fileRef} style={{ display: 'none' }}
         accept=".pptx,.pdf" onChange={handleUpload}
       />
+
+      {/* PIN Popup */}
+      {showPinPopup && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#111425', border: '1px solid #2d3460',
+            borderRadius: '14px', padding: '28px', width: '300px',
+          }}>
+            <h3 style={{ color: '#a78bfa', fontSize: '16px', marginBottom: '6px' }}>
+                PIN
+            </h3>
+            <p style={{ color: '#4b5563', fontSize: '12px', marginBottom: '20px' }}>
+              Unit {selectedUnit?.idx + 1} — {selectedUnit?.name}
+            </p>
+
+            {/* Name input */}
+            <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '5px' }}>
+              Your Name
+            </label>
+            <input
+              placeholder="Enter your name"
+              value={uploaderName}
+              onChange={e => setUploaderName(e.target.value)}
+              style={{
+                width: '100%', background: '#0d0f1a',
+                border: '1px solid #2d3460', color: '#e2e8f0',
+                padding: '10px', borderRadius: '8px',
+                fontSize: '13px', marginBottom: '12px', outline: 'none'
+              }}
+            />
+
+            {/* PIN input */}
+            <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '5px' }}>
+              Upload PIN
+            </label>
+            <input
+              type="password"
+              placeholder="Enter PIN"
+              value={pin}
+              onChange={e => setPin(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handlePinVerify()}
+              style={{
+                width: '100%', background: '#0d0f1a',
+                border: '1px solid #2d3460', color: '#e2e8f0',
+                padding: '10px', borderRadius: '8px',
+                fontSize: '13px', marginBottom: '8px', outline: 'none'
+              }}
+            />
+
+            {pinError && (
+              <p style={{ color: '#f87171', fontSize: '12px', marginBottom: '10px' }}>
+                {pinError}
+              </p>
+            )}
+
+            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+              <button onClick={() => setShowPinPopup(false)} style={{
+                flex: 1, background: 'transparent',
+                border: '1px solid #2d3460', color: '#6b7280',
+                padding: '10px', borderRadius: '8px',
+                fontSize: '13px', cursor: 'pointer'
+              }}>Cancel</button>
+              <button onClick={handlePinVerify} style={{
+                flex: 1, background: '#7c3aed', color: 'white',
+                border: 'none', padding: '10px', borderRadius: '8px',
+                fontSize: '13px', fontWeight: '500', cursor: 'pointer'
+              }}>Verify & Upload</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div style={{
@@ -137,16 +258,11 @@ export default function Units() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            onClick={() => {
-              if (selectedUnit) fileRef.current.click();
-              else alert('Long press a unit first!');
-            }}
-            style={{
-              background: '#7c3aed', color: 'white', border: 'none',
-              padding: '8px 14px', borderRadius: '8px', fontSize: '12px',
-              fontWeight: '500', cursor: 'pointer'
-            }}>
+          <button onClick={handleUploadClick} style={{
+            background: '#7c3aed', color: 'white', border: 'none',
+            padding: '8px 14px', borderRadius: '8px', fontSize: '12px',
+            fontWeight: '500', cursor: 'pointer'
+          }}>
             📤 Upload
           </button>
           <button
