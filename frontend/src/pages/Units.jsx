@@ -159,7 +159,7 @@ export default function Units() {
       {/* Hidden file input */}
       <input
         type="file" ref={fileRef} style={{ display: 'none' }}
-        accept=".pptx,.pdf" onChange={handleUpload}
+        accept=".pptx,.ppt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.mp4,.mkv,.avi" onChange={handleUpload}
       />
 
       {/* PIN Popup */}
@@ -263,7 +263,7 @@ export default function Units() {
             padding: '8px 14px', borderRadius: '8px', fontSize: '12px',
             fontWeight: '500', cursor: 'pointer'
           }}>
-            📤 Upload
+             Upload
           </button>
           <button
             onClick={() => {

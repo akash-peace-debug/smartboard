@@ -14,12 +14,12 @@ export default function Home() {
 
   return (
     <div style={{
-      background: '#0d0f1a', minHeight: '100vh',
+      background: '#f8f9fd', minHeight: '100vh',
       padding: '24px 16px', color: '#e2e8f0'
     }}>
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎓</div>
+        <div style={{ fontSize: '32px', marginBottom: '8px' }}></div>
         <h1 style={{ fontSize: '24px', fontWeight: '600', color: '#a78bfa', margin: '0 0 4px' }}>
           C-Cube
         </h1>
